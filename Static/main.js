@@ -47,6 +47,32 @@ class CrosswordStore {
         $('.xwd__details--date').text(new Date(this.data.publicationDate+ 'T00:00:00').toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}).replace(/(\d+)/, (_, day) => day + (['th','st','nd','rd'][parseInt(day)%10] || 'th')));
         // Fills constructor
         $('.xwd__details--byline span').text(this.data.constructors[0]);
+
+        // Menu buttons
+        const $toolbar = $(".xwd__toolbar--expandedMenu");
+
+        // Button click (toggle its own menu)
+        $toolbar.on("click", ".xwd__tool--button > button", function (e) {
+          e.stopPropagation();
+
+          const $menu = $(this).siblings(".xwd__menu--container");
+          const isVisible = $menu.css("visibility") === "visible";
+
+          // Hide all menus first
+          $(".xwd__menu--container").css("visibility", "hidden");
+
+          // Toggle: if not visible, show it
+          if (!isVisible) {
+            $menu.css("visibility", "visible");
+          }
+        });
+
+        // Click outside: close everything
+        $(document).on("click", function (e) {
+          if (!$(e.target).closest(".xwd__tool--button").length) {
+            $(".xwd__menu--container").css("visibility", "hidden");
+          }
+        });
     }
 
     fillPuzzle(){

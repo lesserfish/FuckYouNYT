@@ -653,6 +653,7 @@ body:has(.ModalBanner-module_banner__yDlAE) {
   }
 }
 .xwd__toolbar--wrapper {
+  z-index: 1;
   background-color: #fff;
   position: relative;
   width: 100%;
