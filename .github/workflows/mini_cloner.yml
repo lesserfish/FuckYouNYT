@@ -1,0 +1,46 @@
+name: Fetch mini.json
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:      # Allows manual triggering
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # THIS IS THE ONLY PERMISSION YOU NEED
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install wget
+        run: sudo apt-get update && sudo apt-get install -y wget
+
+      - name: Download Website
+        run: |
+          curl 'https://www.nytimes.com/svc/crosswords/v6/puzzle/mini.json' \
+            --compressed \
+            -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0' \
+            -H 'Accept: */*' \
+            -H 'Accept-Language: en-US,en;q=0.5' \
+            -H 'Accept-Encoding: gzip, deflate, br, zstd' \
+            -H 'Content-type: application/x-www-form-urlencoded' \
+            -H 'X-Games-Auth-Bypass: true' \
+            -H 'Connection: keep-alive' \
+            -H 'Referer: https://www.nytimes.com/crosswords/game/mini' \
+            -H 'Cookie: nyt-a=MQXV7uMbkVvixlmW8sx1aa; nyt-purr=cfhhcfhhhukfhufshgas2fdnd; nyt-jkidd=uid=0&lastRequest=1757300474155&activeDays=%5B0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C1%2C0%2C1%2C0%2C0%2C1%2C1%2C1%2C1%2C1%2C0%2C0%2C1%5D&adv=8&a7dv=5&a14dv=8&a21dv=8&lastKnownType=anon&newsStartDate=&entitlements=; nyt-traceid=0000000000000000144be8c598fbc4c8; datadome=IIKIsFrDV3vXVWg8zWIm8q9IcbxoK4zEBJZRA2YpcTCXIccTQtwhzJBUTu7QSFrG~UycSAqyD48~Psjl5~JS3nb584IMNi~fubFo0B6Mype8pWrijzQVCNK7fgGyzuD6; nyt-gdpr=0; nyt-geo=JP; _dd_s=rum=0&expire=1757314854859' \
+            -H 'Sec-Fetch-Dest: empty' \
+            -H 'Sec-Fetch-Mode: cors' \
+            -H 'Sec-Fetch-Site: same-origin' \
+            -H 'Pragma: no-cache' \
+            -H 'Cache-Control: no-cache' \
+            -H 'TE: trailers'
+            -o docs/mini.json
+
+      - name: Commit Changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add ./docs/mini.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update website mirror"
+          git push
