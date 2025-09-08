@@ -439,12 +439,15 @@ class CrosswordStore {
 
         $('#reveal-square').on('click', function() { 
             classInstance.assistRevealCurrentSquare();
+            classInstance.grayoutClues();
         });
         $('#reveal-word').on('click', function() { 
             classInstance.assistRevealCurrentWord();
+            classInstance.grayoutClues();
         });
         $('#reveal-puzzle').on('click', function() { 
             classInstance.assistRevealPuzzle();
+            classInstance.grayoutClues();
         });
     }
 
@@ -452,6 +455,7 @@ class CrosswordStore {
         if (this.currentCell > -1){
             this.assistRevealSquare( this.currentCell );
         }
+        this.grayoutClues();
     }
     assistRevealCurrentWord() {
         for(var i = 0; i < this.clueCells.length; i++) {
