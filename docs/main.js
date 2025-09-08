@@ -328,6 +328,7 @@ class CrosswordStore {
         if(this.currentCell > -1){
             var char = event.key.toUpperCase();
             this.setCellText(this.currentCell, char);
+            this.grayoutClues();
             this.nextCell();
 
             this.checkGameOver();
@@ -337,8 +338,30 @@ class CrosswordStore {
     handleBackspace(){
         if(this.currentCell > -1){
             this.setCellText(this.currentCell, "");
+            this.grayoutClues();
             this.previousCell();
         }
+    }
+
+    grayoutClues(){
+        var clues = this.data.body[0].clues;
+        clues.forEach((clue, clueID) => {
+            var clueCells = clue.cells;
+            var complete = true;
+            for(const cell of clueCells){
+                var cellText = this.getCellText(cell);
+                if(cellText.length == 0) {
+                    complete = false;
+                    break;
+                }
+            }
+            if(complete){
+                $(`#clue-id-${clueID}`).addClass('xwd__clue--filled');
+            } else {
+                $(`#clue-id-${clueID}`).removeClass('xwd__clue--filled');
+            }
+        });
+
     }
 
     nextCell(){

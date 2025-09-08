@@ -985,6 +985,9 @@ body:has(.ModalBanner-module_banner__yDlAE) {
 .xwd__clue--selected {
   background-color: #a7d8ff;
 }
+.xwd__clue--filled {
+	color: #959595;
+}
 .xwd__clue--label {
   font-weight: bold;
   text-align: right;
