@@ -1,12 +1,13 @@
-const HORIZONTAL = 1;
-const VERTICAL = 1;
+const ACROSS = 0;
+const DOWN = 1;
 
 class CrosswordStore {
     constructor() {
         this.data = null;
         this.loaded = false;
-        this.direction = HORIZONTAL;
-        this.position = {'x' : 0, 'y' : 0};
+        this.direction = ACROSS;
+        this.selectedCell = 0;
+        this.lastClickedCell = -1;
     }
 
     async loadData() {
@@ -90,12 +91,24 @@ class CrosswordStore {
     }
 
     fillBoardContext(){
+            const classInstance = this;
             const cellsGroup = $('g[data-group="cells"]');
             const cellGroups = cellsGroup.children('g');
 
             cellGroups.each(function(index) {
                 const $rect = $(this).find('rect').first();
-                $rect.attr('id', `cell-id-${index}`);
+                var cellID = index;
+
+                // add id to the rect.
+                $rect.attr('id', `cell-id-${cellID}`);
+
+                // Add click functionality
+                $(this).attr('cell_id', cellID);
+                $(this).css('pointer-events', 'all');
+                $(this).on('click', function() {
+                    var target = $(event.currentTarget);
+                    classInstance.handleRectClick(target);
+                });
             });
     }
 
@@ -152,7 +165,7 @@ class CrosswordStore {
             var clue = this.data.body[0].clues[clueID];
 
             const listItem = $(`
-                <li class="xwd__clue--li" data-direction="0" data-position="${clueID}">
+                <li class="xwd__clue--li" data-direction="0" data-position="${clueID}" id="clue-id-${clueID}">
                   <span class="xwd__clue--label">${clue.label}</span>
                   <span class="xwd__clue--text xwd__clue-format">${clue.text[0].plain}</span>
                 </li>
@@ -177,7 +190,7 @@ class CrosswordStore {
             var clue = this.data.body[0].clues[clueID];
 
             const listItem = $(`
-                <li class="xwd__clue--li" data-direction="1" data-position="${clueID}">
+                <li class="xwd__clue--li" data-direction="1" data-position="${clueID}" id="clue-id-${clueID}">
                   <span class="xwd__clue--label">${clue.label}</span>
                   <span class="xwd__clue--text xwd__clue-format">${clue.text[0].plain}</span>
                 </li>
@@ -217,12 +230,61 @@ class CrosswordStore {
         for(var i = 0; i < cells.length; i++){
             var cellID = cells[i];
             $(`#cell-id-${cellID}`).addClass('xwd__cell--highlighted');
-            console.log("...")
-            console.log($(`#cell-id-${cellID}`))
         }
 
-        console.log(cells)
+        // Select the first square of the hint
+        var selectedCell = cells[0];
+        this.selectedCell = selectedCell;
+        $('[id^="cell-id-"]').removeClass('xwd__cell--selected');
+        $(`#cell-id-${selectedCell}`).addClass('xwd__cell--selected');
 
+        this.direction = direction;
+    }
+
+    handleRectClick(target){
+        var target = target;
+        console.log(target);
+        var cellID = $(target).attr("cell_id");
+        const rect = $(target).find('rect').first();
+
+        var cellInfo = this.data.body[0].cells[cellID];
+
+        if(Object.keys(cellInfo).length != 0){
+
+            if(this.lastClickedCell == cellID) {
+                if(this.direction == ACROSS){
+                    this.direction = DOWN;
+                } else {
+                    this.direction = ACROSS;
+                }
+            }
+
+            this.lastClickedCell = cellID;
+
+            // Highlight selected cell
+            $('[id^="cell-id-"]').removeClass('xwd__cell--selected');
+            $(rect).addClass('xwd__cell--selected');
+
+            // Highlight clues
+            const cellClue = cellInfo.clues[this.direction];
+
+            $('ol.xwd__clue-list--list li').removeClass('xwd__clue--selected');
+            $(`#clue-id-${cellClue}`).addClass('xwd__clue--selected');
+
+            console.log(`#clue-id-${cellClue}`)
+            console.log($(`#clue-id-${cellClue}`))
+
+            // Highlight clue cells
+            var clueCells = this.data.body[0].clues[cellClue].cells;
+
+            console.log(clueCells);
+            $('[id^="cell-id-"]').removeClass('xwd__cell--highlighted');
+
+            for(var i = 0; i < clueCells.length; i++){
+                var clueCellID = clueCells[i];
+                $(`#cell-id-${clueCellID}`).addClass('xwd__cell--highlighted');
+            }
+        }
     }
 
     createCallbacks(){

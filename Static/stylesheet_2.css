@@ -593,6 +593,9 @@ body:has(.ModalBanner-module_banner__yDlAE) {
 .xwd__cell--highlighted {
   fill: #a7d8ff;
 }
+.xwd__cell--selected {
+  fill: #ffda00;
+}
 @media (orientation: landscape) {
 }
 .xwd__clue-bar-desktop--bar {
