@@ -573,6 +573,15 @@ body:has(.ModalBanner-module_banner__yDlAE) {
 .xwd__assistance--revealed .xwd__assistance--tatter {
   fill: #fff;
 }
+.xwd__assistance--confirmed ~ text:last-of-type {
+	fill: #2860d8;
+}
+.xwd__assistance--wrong ~ text:last-of-type{
+  stroke: #e63333;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
 .xwd__cell text {
   transition: 0.1s font-size;
 }

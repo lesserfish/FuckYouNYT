@@ -6,7 +6,6 @@ class CrosswordStore {
         this.data = null;
         this.loaded = false;
         this.direction = ACROSS;
-        this.selectedCell = 0;
         this.currentCell = -1;
         this.clueCells = [];
     }
@@ -231,10 +230,12 @@ class CrosswordStore {
         }
 
         // Select the first square of the hint
-        var selectedCell = cells[0];
-        this.selectedCell = selectedCell;
+        var currentCell = cells[0];
+        this.currentCell = currentCell;
         $('[id^="cell-id-"]').removeClass('xwd__cell--selected');
-        $(`#cell-id-${selectedCell}`).addClass('xwd__cell--selected');
+        $(`#cell-id-${currentCell}`).addClass('xwd__cell--selected');
+
+        this.clueCells = cells;
 
         this.direction = direction;
     }
@@ -262,7 +263,7 @@ class CrosswordStore {
     }
 
     getCellText(cellID){
-        var target = $(`g[g_cell_id="${this.currentCell}"]`);
+        var target = $(`g[g_cell_id="${cellID}"]`);
         const textElements = target.find('text');
 
         
@@ -283,7 +284,7 @@ class CrosswordStore {
     }
 
     setCellText(cellID, char){
-        var target = $(`g[g_cell_id="${this.currentCell}"]`);
+        var target = $(`g[g_cell_id="${cellID}"]`);
         const textElements = target.find('text');
 
         
@@ -300,6 +301,9 @@ class CrosswordStore {
         } 
 
         targetTextElement.text(char);
+
+        $(`#cell-id-${cellID}`).removeClass('xwd__assistance--wrong');
+        $(`#cell-id-${cellID}`).removeClass('xwd__assistance--confirmed');
     }
 
     handleKeyDown(event){
@@ -380,20 +384,94 @@ class CrosswordStore {
                 classInstance.handleBackspace(); // Allow backspace to work normally
             }
         })   
+        $('#check-square').on('click', function() { 
+            classInstance.assistCheckCurrentSquare();
+        });
+        $('#check-word').on('click', function() {
+            classInstance.assistCheckCurrentWord();
+        });
+        $('#check-puzzle').on('click', function() {
+            classInstance.assistCheckPuzzle();
+        });
+
+
+        $('#reveal-square').on('click', function() { 
+            classInstance.assistRevealCurrentSquare();
+        });
+        $('#reveal-word').on('click', function() { 
+            classInstance.assistRevealCurrentWord();
+        });
+        $('#reveal-puzzle').on('click', function() { 
+            classInstance.assistRevealPuzzle();
+        });
     }
 
-    getClue(row, col) {
-        if (!this.loaded) throw new Error('Data not loaded');
-        return this.data.clues[row][col];
+    assistRevealCurrentSquare() {
+        if (this.currentCell > -1){
+            this.assistRevealSquare( this.currentCell );
+        }
+    }
+    assistRevealCurrentWord() {
+        for(var i = 0; i < this.clueCells.length; i++) {
+            this.assistRevealSquare(this.clueCells[i]);
+        }
     }
 
-    getSolution(row, col) {
-        if (!this.loaded) throw new Error('Data not loaded');
-        return this.data.solutions[row][col];
+    assistRevealSquare(cellID) {
+        var cellInfo = this.data.body[0].cells[cellID];
+        var correctText = cellInfo.answer;
+        this.setCellText(cellID, correctText);
+        this.assistCheckSquare(cellID);
     }
 
-    isCorrect(row, col, answer) {
-        return this.getSolution(row, col) === answer.trim().toUpperCase();
+    assistRevealPuzzle() {
+        var allCells = this.data.body[0].cells;
+        for(var i = 0; i < allCells.length; i++) {
+            var cellInfo = allCells[i];
+            if(Object.keys(cellInfo).length != 0){
+                this.assistRevealSquare(i);
+            }
+        }
+    }
+
+    assistCheckSquare(cellID) {
+        if( this.checkSquare(cellID) ) {
+            $(`#cell-id-${cellID}`).addClass('xwd__assistance--confirmed');
+            $(`#cell-id-${cellID}`).removeClass('xwd__assistance--wrong');
+        } else {
+            $(`#cell-id-${cellID}`).addClass('xwd__assistance--wrong');
+            $(`#cell-id-${cellID}`).removeClass('xwd__assistance--confirmed');
+        }
+        
+    }
+
+    assistCheckPuzzle() {
+        var allCells = this.data.body[0].cells;
+        for(var i = 0; i < allCells.length; i++) {
+            var cellInfo = allCells[i];
+            if(Object.keys(cellInfo).length != 0){
+                this.assistCheckSquare(i);
+            }
+        }
+    }
+    assistCheckCurrentWord() {
+        for(var i = 0; i < this.clueCells.length; i++) {
+            this.assistCheckSquare(this.clueCells[i]);
+        }
+    }
+
+    checkSquare(cellID) {
+        var cellInfo = this.data.body[0].cells[cellID];
+        var cellText = this.getCellText(cellID);
+        var correctText = cellInfo.answer;
+
+        return (cellText == correctText) 
+    }
+
+    assistCheckCurrentSquare() {
+        if(this.currentCell > -1){
+            this.assistCheckSquare(this.currentCell)
+        }
     }
 }
 

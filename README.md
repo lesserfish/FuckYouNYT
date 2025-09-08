@@ -27,3 +27,13 @@ You can highlight a cell by adding xwd__cell--highlighted to the class of the re
 You can highlight a hint by adding xwd__clue--selected to the class of the li. For example:
 
 <li class="xwd__clue--li xwd__clue--selected"><span class="xwd__clue--label">4</span><span class="xwd__clue--text xwd__clue-format">Surplus</span></li>
+
+
+
+Also
+
+xwd__assistance--confirmed
+
+.xwd__assistance--confirmed ~ text:last-of-type {
+	fill: #2860d8;
+}
