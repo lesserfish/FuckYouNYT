@@ -7,7 +7,8 @@ class CrosswordStore {
         this.loaded = false;
         this.direction = ACROSS;
         this.selectedCell = 0;
-        this.lastClickedCell = -1;
+        this.currentCell = -1;
+        this.clueCells = [];
     }
 
     async loadData() {
@@ -23,8 +24,6 @@ class CrosswordStore {
             
             this.data = await response.json();
             this.loaded = true;
-
-            console.log(this.data);
 
         } catch (error) {
             console.error('Failed to load crossword data:', error);
@@ -83,7 +82,6 @@ class CrosswordStore {
 
         // Add the SVG to the div
         
-        console.log(svgObject);
         $('.xwd__board--content').append(svgObject);
         
         // Fill with context
@@ -103,7 +101,7 @@ class CrosswordStore {
                 $rect.attr('id', `cell-id-${cellID}`);
 
                 // Add click functionality
-                $(this).attr('cell_id', cellID);
+                $(this).attr('g_cell_id', cellID);
                 $(this).css('pointer-events', 'all');
                 $(this).on('click', function() {
                     var target = $(event.currentTarget);
@@ -243,15 +241,14 @@ class CrosswordStore {
 
     handleRectClick(target){
         var target = target;
-        console.log(target);
-        var cellID = $(target).attr("cell_id");
+        var cellID = $(target).attr("g_cell_id");
         const rect = $(target).find('rect').first();
 
         var cellInfo = this.data.body[0].cells[cellID];
 
         if(Object.keys(cellInfo).length != 0){
 
-            if(this.lastClickedCell == cellID) {
+            if(this.currentCell == cellID) {
                 if(this.direction == ACROSS){
                     this.direction = DOWN;
                 } else {
@@ -259,35 +256,130 @@ class CrosswordStore {
                 }
             }
 
-            this.lastClickedCell = cellID;
+            this.currentCell = cellID;
+            this.highlightCell(cellID);
+        }
+    }
 
-            // Highlight selected cell
-            $('[id^="cell-id-"]').removeClass('xwd__cell--selected');
-            $(rect).addClass('xwd__cell--selected');
+    getCellText(cellID){
+        var target = $(`g[g_cell_id="${this.currentCell}"]`);
+        const textElements = target.find('text');
 
-            // Highlight clues
-            const cellClue = cellInfo.clues[this.direction];
+        
+        let targetTextElement;
+        if (textElements.length == 0){
+            console.error("Failed to find cell")
+            return "";
+        }
 
-            $('ol.xwd__clue-list--list li').removeClass('xwd__clue--selected');
-            $(`#clue-id-${cellClue}`).addClass('xwd__clue--selected');
+        if (textElements.length >= 2) {
+            targetTextElement = textElements.eq(1); // Get the second text element
+        } else if (textElements.length === 1) {
+            targetTextElement = textElements.eq(0); // Get the first (and only) text element
+        } 
 
-            console.log(`#clue-id-${cellClue}`)
-            console.log($(`#clue-id-${cellClue}`))
+        return targetTextElement.text();
 
-            // Highlight clue cells
-            var clueCells = this.data.body[0].clues[cellClue].cells;
+    }
 
-            console.log(clueCells);
-            $('[id^="cell-id-"]').removeClass('xwd__cell--highlighted');
+    setCellText(cellID, char){
+        var target = $(`g[g_cell_id="${this.currentCell}"]`);
+        const textElements = target.find('text');
 
-            for(var i = 0; i < clueCells.length; i++){
-                var clueCellID = clueCells[i];
-                $(`#cell-id-${clueCellID}`).addClass('xwd__cell--highlighted');
-            }
+        
+        let targetTextElement;
+        if (textElements.length == 0){
+            console.error("Failed to find cell")
+            return;
+        }
+
+        if (textElements.length >= 2) {
+            targetTextElement = textElements.eq(1); // Get the second text element
+        } else if (textElements.length === 1) {
+            targetTextElement = textElements.eq(0); // Get the first (and only) text element
+        } 
+
+        targetTextElement.text(char);
+    }
+
+    handleKeyDown(event){
+        if(this.currentCell > -1){
+            var char = event.key.toUpperCase();
+            this.setCellText(this.currentCell, char);
+            this.nextCell();
+        }
+    }
+
+    handleBackspace(){
+        if(this.currentCell > -1){
+            this.setCellText(this.currentCell, "");
+            this.previousCell();
+        }
+    }
+
+    nextCell(){
+        const mod = (a, b) => ((a % b) + b) % b;
+        var dimensions = this.data.body[0].dimensions;
+        if(this.clueCells.length > 0){
+            var currentIndex = this.clueCells.findIndex(cell => cell == this.currentCell);
+            var nextIndex = mod((currentIndex + 1), this.clueCells.length)
+            var nextCellID = this.clueCells[nextIndex];
+            
+            this.currentCell = nextCellID;
+            this.highlightCell(nextCellID);
+        }
+    }
+
+    previousCell(){
+        const mod = (a, b) => ((a % b) + b) % b;
+        var dimensions = this.data.body[0].dimensions;
+        if(this.clueCells.length > 0){
+            var currentIndex = this.clueCells.findIndex(cell => cell == this.currentCell);
+            var nextIndex = mod((currentIndex - 1), this.clueCells.length)
+            console.log(nextIndex);
+            var nextCellID = this.clueCells[nextIndex];
+            
+            this.currentCell = nextCellID;
+            this.highlightCell(nextCellID);
+        }
+    }
+
+    highlightCell(cellID){
+        var rect = $(`#cell-id-${cellID}`);
+        var cellInfo = this.data.body[0].cells[cellID];
+
+        // Highlight selected cell
+        $('[id^="cell-id-"]').removeClass('xwd__cell--selected');
+        $(rect).addClass('xwd__cell--selected');
+
+        // Highlight clues
+        const cellClue = cellInfo.clues[this.direction];
+
+        $('ol.xwd__clue-list--list li').removeClass('xwd__clue--selected');
+        $(`#clue-id-${cellClue}`).addClass('xwd__clue--selected');
+
+        // Highlight clue cells
+        var clueCells = this.data.body[0].clues[cellClue].cells;
+        this.clueCells = clueCells;
+
+        $('[id^="cell-id-"]').removeClass('xwd__cell--highlighted');
+
+        for(var i = 0; i < clueCells.length; i++){
+            var clueCellID = clueCells[i];
+            $(`#cell-id-${clueCellID}`).addClass('xwd__cell--highlighted');
         }
     }
 
     createCallbacks(){
+        var classInstance = this;
+        $(document).on('keydown', function(e) {
+            if (e.key.length === 1) {
+                classInstance.handleKeyDown(e);
+            }
+            if (e.key === 'Backspace') {
+                classInstance.handleBackspace(); // Allow backspace to work normally
+            }
+        })   
     }
 
     getClue(row, col) {
