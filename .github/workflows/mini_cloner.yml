@@ -34,7 +34,7 @@ jobs:
             -H 'Sec-Fetch-Site: same-origin' \
             -H 'Pragma: no-cache' \
             -H 'Cache-Control: no-cache' \
-            -H 'TE: trailers'
+            -H 'TE: trailers' \
             -o docs/mini.json
 
       - name: Commit Changes
