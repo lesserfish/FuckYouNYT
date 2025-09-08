@@ -311,6 +311,8 @@ class CrosswordStore {
             var char = event.key.toUpperCase();
             this.setCellText(this.currentCell, char);
             this.nextCell();
+
+            this.checkGameOver();
         }
     }
 
@@ -422,6 +424,8 @@ class CrosswordStore {
         var correctText = cellInfo.answer;
         this.setCellText(cellID, correctText);
         this.assistCheckSquare(cellID);
+
+        this.checkGameOver();
     }
 
     assistRevealPuzzle() {
@@ -471,6 +475,25 @@ class CrosswordStore {
     assistCheckCurrentSquare() {
         if(this.currentCell > -1){
             this.assistCheckSquare(this.currentCell)
+        }
+    }
+
+    isPuzzleDone(){
+        var allCells = this.data.body[0].cells;
+        for(var i = 0; i < allCells.length; i++) {
+            var cellInfo = allCells[i];
+            if(Object.keys(cellInfo).length != 0){
+                if( ! this.checkSquare(i) ){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    checkGameOver(){
+        if( this.isPuzzleDone() ){
+            alert("Game Over!")
         }
     }
 }
