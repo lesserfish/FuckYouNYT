@@ -28,7 +28,6 @@ jobs:
             -H 'X-Games-Auth-Bypass: true' \
             -H 'Connection: keep-alive' \
             -H 'Referer: https://www.nytimes.com/crosswords/game/mini' \
-            -H 'Cookie: nyt-a=MQXV7uMbkVvixlmW8sx1aa; nyt-purr=cfhhcfhhhukfhufshgas2fdnd; nyt-jkidd=uid=0&lastRequest=1757300474155&activeDays=%5B0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C0%2C1%2C0%2C1%2C0%2C0%2C1%2C1%2C1%2C1%2C1%2C0%2C0%2C1%5D&adv=8&a7dv=5&a14dv=8&a21dv=8&lastKnownType=anon&newsStartDate=&entitlements=; nyt-traceid=0000000000000000144be8c598fbc4c8; datadome=IIKIsFrDV3vXVWg8zWIm8q9IcbxoK4zEBJZRA2YpcTCXIccTQtwhzJBUTu7QSFrG~UycSAqyD48~Psjl5~JS3nb584IMNi~fubFo0B6Mype8pWrijzQVCNK7fgGyzuD6; nyt-gdpr=0; nyt-geo=JP; _dd_s=rum=0&expire=1757314854859' \
             -H 'Sec-Fetch-Dest: empty' \
             -H 'Sec-Fetch-Mode: cors' \
             -H 'Sec-Fetch-Site: same-origin' \
