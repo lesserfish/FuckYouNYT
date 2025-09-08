@@ -8,6 +8,7 @@ class CrosswordStore {
         this.direction = ACROSS;
         this.currentCell = -1;
         this.clueCells = [];
+        this.gameOver = false;
     }
 
     async loadData() {
@@ -499,8 +500,11 @@ class CrosswordStore {
     }
 
     checkGameOver(){
-        if( this.isPuzzleDone() ){
-            alert("Game Over!")
+        if( !this.gameOver) {
+            if( this.isPuzzleDone() ){
+                this.gameOver = true;
+                alert("Game Over!")
+            }
         }
     }
 }
