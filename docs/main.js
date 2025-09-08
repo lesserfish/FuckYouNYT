@@ -238,14 +238,23 @@ class CrosswordStore {
             $(`#cell-id-${cellID}`).addClass('xwd__cell--highlighted');
         }
 
-        // Select the first square of the hint
+        // Select the first (empty) square of the hint
         var currentCell = cells[0];
+
+        for(var i = 0; i < cells.length; i++){
+            var cellID = cells[i];
+            var cellContent = this.getCellText(cellID);
+            if(cellContent.length == 0){
+                currentCell = cellID;
+                break;
+            }
+        }
+
         this.currentCell = currentCell;
         $('[id^="cell-id-"]').removeClass('xwd__cell--selected');
         $(`#cell-id-${currentCell}`).addClass('xwd__cell--selected');
 
         this.clueCells = cells;
-
         this.direction = direction;
     }
 
