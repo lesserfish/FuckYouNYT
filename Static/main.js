@@ -42,6 +42,14 @@ class CrosswordStore {
     }
 
     fillMetadata() {
+        // Change Title
+        $('title[data-testid="page-title"]').text( new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        }).replace(/(\d+)/, (_, day) => day + (['th','st','nd','rd'][parseInt(day)%10] || 'th')) + " The Mini puzzle — The New York Times" );
+
         // Fills date
         $('.xwd__details--date').text(new Date(this.data.publicationDate+ 'T00:00:00').toLocaleDateString('en-US', {month: 'long', day: 'numeric', year: 'numeric'}).replace(/(\d+)/, (_, day) => day + (['th','st','nd','rd'][parseInt(day)%10] || 'th')));
         // Fills constructor
@@ -342,7 +350,6 @@ class CrosswordStore {
         if(this.clueCells.length > 0){
             var currentIndex = this.clueCells.findIndex(cell => cell == this.currentCell);
             var nextIndex = mod((currentIndex - 1), this.clueCells.length)
-            console.log(nextIndex);
             var nextCellID = this.clueCells[nextIndex];
             
             this.currentCell = nextCellID;
