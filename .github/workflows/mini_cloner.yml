@@ -1,7 +1,7 @@
 name: Fetch mini.json
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+    - cron: '1 10 * * *'  # Runs daily at 1:10 AM UTC
   workflow_dispatch:      # Allows manual triggering
 
 jobs:
