@@ -372,6 +372,18 @@ class CrosswordStore {
             var nextIndex = mod((currentIndex + 1), this.clueCells.length)
             var nextCellID = this.clueCells[nextIndex];
             
+            // Skip cells until you find one that is empty
+            for(var i = 0; i < this.clueCells.length; i++){
+                var possibleCellIndex = mod( (nextIndex + i), this.clueCells.length);
+                var possibleCellID = this.clueCells[possibleCellIndex];
+                var possibleCellContent = this.getCellText(possibleCellID);
+
+                if(possibleCellContent.length == 0){
+                    nextCellID = possibleCellID;
+                    break;
+                }
+            }
+
             this.currentCell = nextCellID;
             this.highlightCell(nextCellID);
         }
