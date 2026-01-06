@@ -17,7 +17,7 @@ jobs:
         run: |
           DIR="backup"
           mkdir -p $DIR
-          FILE="mini_$(date +'%y_%m_%d')"
+          FILE="mini_$(date +'%y_%m_%d').json"
           rm -rf $DIR/$FILE
           cp -r docs/mini.json $DIR/$FILE
           git config --global user.name "GitHub Actions"
