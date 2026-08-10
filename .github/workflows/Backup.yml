@@ -19,6 +19,7 @@ jobs:
           FILE="mini_$(date +'%y_%m_%d').json"
           rm -rf $DIR/$FILE
           cp -r docs/mini.json $DIR/$FILE
+          cp -r docs/mini.json docs/older/$FILE
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add "./$DIR"

@@ -13,18 +13,26 @@ class CrosswordStore {
 
     async loadData() {
         try {
-            const response = await fetch("./mini.json", {
+            const params = new URLSearchParams(window.location.search);
+            const puzzle = params.get('puzzle');
+    
+            const file = puzzle
+                ? `older/mini_${puzzle}.json`
+                : './mini.json';
+    
+            const response = await fetch(file, {
                 headers: {
-                    // Some APIs require specific headers
                     'Accept': 'application/json',
                 }
             });
-            
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
             this.data = await response.json();
             this.loaded = true;
-
+    
         } catch (error) {
             console.error('Failed to load crossword data:', error);
             throw error;
