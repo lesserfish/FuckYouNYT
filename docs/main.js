@@ -27,7 +27,12 @@ class CrosswordStore {
             });
     
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                console.error(`Request Puzzle does not exist. Going to the current puzzle.`);
+
+                const url = new URL(window.location.href);
+                url.searchParams.delete("puzzle");
+                window.location.href = url.href;
+
             }
     
             this.data = await response.json();
@@ -436,6 +441,29 @@ class CrosswordStore {
         }
     }
 
+    goToPuzzle(puzzle){
+        var date = new Date(this.data.publicationDate+ 'T00:00:00');
+
+        if(puzzle == 1){
+            date.setDate(date.getDate() + 1);
+        }
+        else if(puzzle == -1){
+            date.setDate(date.getDate() - 1);
+        }
+
+        const formatter = new Intl.DateTimeFormat('en-CA', {
+          year: '2-digit',
+          month: '2-digit',
+          day: '2-digit'
+        });
+        
+        const datestr = formatter.format(date).replaceAll('-', '_');
+
+        const url = new URL(window.location.href);
+        url.searchParams.set("puzzle", datestr);
+        window.location.href = url.href;
+    }
+
     createCallbacks(){
         var classInstance = this;
         $(document).on('keydown', function(e) {
@@ -446,6 +474,12 @@ class CrosswordStore {
                 classInstance.handleBackspace(); // Allow backspace to work normally
             }
         })   
+        $('#previous-puzzle').on('click', function() {
+            classInstance.goToPuzzle(-1);
+        });
+        $('#next-puzzle').on('click', function() {
+            classInstance.goToPuzzle(1);
+        });
         $('#check-square').on('click', function() { 
             classInstance.assistCheckCurrentSquare();
         });
