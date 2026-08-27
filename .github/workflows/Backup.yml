@@ -16,10 +16,12 @@ jobs:
         run: |
           DIR="backup"
           mkdir -p $DIR
+          DATE="$(date +'%y_%m_%d')"
           FILE="mini_$(date +'%y_%m_%d').json"
           rm -rf $DIR/$FILE
           cp -r docs/mini.json $DIR/$FILE
           cp -r docs/mini.json docs/older/$FILE
+          echo $DATE >> docs/older/mini_list.csv
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add "./$DIR"

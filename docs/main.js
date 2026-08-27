@@ -33,6 +33,8 @@ class CrosswordStore {
                 url.searchParams.delete("puzzle");
                 window.location.href = url.href;
 
+                return;
+
             }
     
             this.data = await response.json();
@@ -440,7 +442,47 @@ class CrosswordStore {
             $(`#cell-id-${clueCellID}`).addClass('xwd__cell--highlighted');
         }
     }
+    
+    async goToRandomPuzzle(){
+        try {
+            const file = `older/mini_list.csv`;
+    
+            const response = await fetch(file, {
+                headers: {
+                    'Accept': 'text/csv',
+                }
+            });
+    
+            if (!response.ok) {
+                console.error(`Failed to get random puzzle...`);
 
+                const url = new URL(window.location.href);
+                url.searchParams.delete("puzzle");
+                window.location.href = url.href;
+                return;
+            }
+
+            
+            const csvText = await response.text();
+            const lines = [...new Set(
+                csvText
+                    .split(/\r?\n/)
+                    .slice(1)
+                    .map(line => line.trim())
+                    .filter(Boolean)
+            )];
+
+            const datestr = lines[Math.floor(Math.random() * lines.length)];
+
+            const url = new URL(window.location.href);
+            url.searchParams.set("puzzle", datestr);
+            window.location.href = url.href;
+        }
+        catch (error) {
+            console.error('Failed going to a random puzzle:', error);
+            throw error;
+        }
+    }
     goToPuzzle(puzzle){
         var date = new Date(this.data.publicationDate+ 'T00:00:00');
 
@@ -479,6 +521,9 @@ class CrosswordStore {
         });
         $('#next-puzzle').on('click', function() {
             classInstance.goToPuzzle(1);
+        });
+        $('#random-puzzle').on('click', async function() {
+            await classInstance.goToRandomPuzzle();
         });
         $('#check-square').on('click', function() { 
             classInstance.assistCheckCurrentSquare();
@@ -604,3 +649,4 @@ class CrosswordStore {
     await crosswordStore.loadData();
     await crosswordStore.initialize();
 })();
+
