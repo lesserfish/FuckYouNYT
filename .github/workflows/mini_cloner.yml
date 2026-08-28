@@ -16,7 +16,7 @@ jobs:
       - name: Install curl
         run: sudo apt-get update && sudo apt-get install -y curl
 
-      - name: Download Website
+      - name: Download Mini
         run: |
           curl 'https://www.nytimes.com/svc/crosswords/v6/puzzle/mini.json' \
             --compressed \
@@ -36,11 +36,32 @@ jobs:
             -H 'TE: trailers' \
             -o docs/mini.json
 
+      - name: Download Midi
+        run: |
+          curl 'https://www.nytimes.com/svc/crosswords/v6/puzzle/midi.json' \
+            --compressed \
+            -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:142.0) Gecko/20100101 Firefox/142.0' \
+            -H 'Accept: */*' \
+            -H 'Accept-Language: en-US,en;q=0.5' \
+            -H 'Accept-Encoding: gzip, deflate, br, zstd' \
+            -H 'Content-type: application/x-www-form-urlencoded' \
+            -H 'X-Games-Auth-Bypass: true' \
+            -H 'Connection: keep-alive' \
+            -H 'Referer: https://www.nytimes.com/crosswords/game/mini' \
+            -H 'Sec-Fetch-Dest: empty' \
+            -H 'Sec-Fetch-Mode: cors' \
+            -H 'Sec-Fetch-Site: same-origin' \
+            -H 'Pragma: no-cache' \
+            -H 'Cache-Control: no-cache' \
+            -H 'TE: trailers' \
+            -o docs/midi.json
+
       - name: Commit Changes
         run: |
           git pull
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add ./docs/mini.json
+          git add ./docs/midi.json
           git diff --quiet && git diff --staged --quiet || git commit -m "Update website mirror"
           git push

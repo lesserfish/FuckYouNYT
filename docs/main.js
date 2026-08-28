@@ -3,6 +3,14 @@ const DOWN = 1;
 
 class CrosswordStore {
     constructor() {
+        const page = window.location.pathname.split('/').pop();
+        
+        this.puzzle = "mini";
+        if (page === 'index.html' || page === "index.html") {
+          this.puzzle = "mini";
+        } else if (page === 'midi.html' || page === "midi") {
+          this.puzzle = "midi";
+        }
         this.data = null;
         this.loaded = false;
         this.direction = ACROSS;
@@ -17,8 +25,8 @@ class CrosswordStore {
             const puzzle = params.get('puzzle');
     
             const file = puzzle
-                ? `older/mini_${puzzle}.json`
-                : './mini.json';
+                ? `older/${this.puzzle}_${puzzle}.json`
+                : `./${this.puzzle}.json`; 
     
             const response = await fetch(file, {
                 headers: {
@@ -445,7 +453,7 @@ class CrosswordStore {
     
     async goToRandomPuzzle(){
         try {
-            const file = `older/mini_list.csv`;
+            const file = `older/${this.puzzle}_list.csv`;
     
             const response = await fetch(file, {
                 headers: {
