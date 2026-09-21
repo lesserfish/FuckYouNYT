@@ -636,7 +636,7 @@ body:has(.ModalBanner-module_banner__yDlAE) {
   align-items: flex-start;
   display: flex;
   height: 100vh;
-  max-height: 660px;
+  max-height: 1060px;
   justify-content: space-around;
   margin: auto;
   max-width: 1132px;
